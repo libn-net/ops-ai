@@ -1,0 +1,5 @@
+build:
+    script: 
+       - pwd
+       - mvn compile sonar:sonar -DskipTests
+       - mvn clean

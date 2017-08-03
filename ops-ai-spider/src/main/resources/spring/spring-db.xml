@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="publishTransactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="publishDataSource"/>
+    </bean>
+    <bean id="publishDataSource" class="com.github.mybatis.spring.DynamicDataSource">
+        <property name="configName" value="fs-db-cloud"/>
+    </bean>
+    <!-- define the SqlSessionFactory -->
+    <bean id="publishSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="publishDataSource"/>
+        <property name="typeAliasesPackage" value="com.fxiaoke.dbcloud.entity"/>
+        <property name="configLocation" value="classpath:mybatis/mybatis-config.xml"/>
+        <!--<property name="mapperLocations" value="classpath:mybatis/mapper/*.xml"/>-->
+    </bean>
+    <!-- scan for mapper and let them be autowired -->
+    <bean class="com.github.mybatis.spring.ScannerConfigurer">
+        <property name="basePackage" value="com.fxiaoke.dbcloud.mapper"/>
+        <property name="sqlSessionFactoryBeanName" value="publishSqlSessionFactory"/>
+    </bean>
+</beans>

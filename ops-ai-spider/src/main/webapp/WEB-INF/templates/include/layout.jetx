@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="renderer" content="webkit">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${title}</title>
+  <link href="//static.foneshare.cn/oss/datatables-1.10.12/datatables.min.css" rel="stylesheet" type="text/css"/>
+  <link href="//static.foneshare.cn/oss/bootstrap-3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+  #tag layout_block_default("headContent")#end
+  <style>
+    .highlight {
+      background-color: #FFFF88 !important;
+    }
+
+    tr.even:hover, tr.odd:hover {
+      background-color: whitesmoke !important;
+    }
+
+    samp .bg-info {
+      background-color: #5bc0de;
+    }
+
+    samp .bg-warning {
+      background-color: #f0ad4e;
+    }
+
+    samp .bg-danger {
+      background-color: #d9534f;
+    }
+
+    .table th {
+      text-align: center
+    }
+
+    td.highlight {
+      font-weight: bold;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  #include("nav.inc.jetx")
+<div class="container-fluid col-xs-12 col-sm-12 col-md-push-1 col-md-10 col-lg-push-1 col-lg-10">
+  <div class="row">
+    #include("alert.inc.jetx")
+    #tag layout_block_default("bodyContent")#end
+  </div>
+</div>
+<script src="//static.foneshare.cn/oss/js/jquery-2.1.4.min.js"></script>
+<script src="//static.foneshare.cn/oss/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+<script src="//static.foneshare.cn/oss/datatables-1.10.12/datatables.min.js"></script>
+<script src="//static.foneshare.cn/oss/jquery.highlight-5.closure.js"></script>
+<script>
+  window._gtag={traceId: '${requestScope.PV_TRACE_ID}', ajaxCount: 0};
+  $(document).bind("ajaxSend", function(e, xhr){
+    var trace = _gtag.traceId + ':' + (++ _gtag.ajaxCount);
+    xhr.setRequestHeader("x-trace-id", trace);
+  });
+</script>
+#tag layout_block_default("scriptContent")#end
+</body>
+</html>

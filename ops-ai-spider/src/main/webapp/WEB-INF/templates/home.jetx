@@ -1,0 +1,11 @@
+#set(title="首页")
+#tag layout_block("bodyContent")
+<div class="container-fluid">
+  <p class="well">DB云</p>
+##  <p>1.修改haproxy和nginx的配置；</p>
+##  <p>2.查看与创建服务代理；</p>
+##  <p>3.将服务注册到consul agent；</p>
+##  <p>4.查看已注册到consul数据中心的服务</p>
+</div>
+#end
+#include("/include/layout.jetx")

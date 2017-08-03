@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- Root Context: defines shared resources visible to all other web components -->
+    <context:component-scan base-package="com.fxiaoke.dbcloud.service"/>
+
+    <!-- blocked autowire -->
+    <context:annotation-config/>
+    <bean class="com.fxiaoke.metrics.MetricsConfiguration"/>
+    <!--<import resource="classpath:spring/spring-aop.xml"/>-->
+    <import resource="classpath:spring/spring-cms.xml"/>
+    <import resource="classpath:spring/spring-guava.xml"/>
+    <import resource="classpath:spring/spring-db.xml"/>
+    <import resource="classpath:spring/spring-shiro.xml"/>
+    <import resource="classpath:spring/spring-scheduler.xml"/>
+</beans>

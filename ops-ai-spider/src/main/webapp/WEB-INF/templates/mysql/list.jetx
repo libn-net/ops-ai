@@ -1,0 +1,127 @@
+#set(title="Mysql集群列表")
+#set(navbar="mysql")
+#tag layout_block("headContent")
+<style>
+    .dataTable td:nth-child(1) {width: 30px;text-align: center;}
+    .dataTable td:nth-child(5) {width: 70px;text-align: center;}
+    .dataTable td:nth-child(6) {width: 170px;text-align: center;}
+    .dataTable td:nth-child(7) {width: 80px;text-align: center;}
+    .dataTable td:nth-child(9) {width: 200px;text-align: center;}
+</style>
+#end
+
+#tag layout_block("bodyContent")
+<div class="container-fluid" id="content">
+    <ol class="breadcrumb">
+        <li><a href="${CONTEXT_PATH}/"><span class="glyphicon glyphicon-home"></span></a></li>
+        <li class="active">Mysql集群</li>
+        <span class="pull-right"><a href="${CONTEXT_PATH}/mysql/create" class="btn btn-primary btn-xs">新建集群</a></span>
+    </ol>
+    <div>
+        <!-- 表格开始 -->
+        <table class="table table-bordered" id="dataTable">
+            <thead>
+            <tr>
+                <th>序号</th>
+                <th>集群</th>
+                <th>环境</th>
+                <th>标签</th>
+                <th>架构</th>
+                <th>状态</th>
+                <th>负责人</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+                #for(MysqlCluster i: list)
+            <tr>
+                <td>${for.index}</td>
+                <td><a href="${CONTEXT_PATH}/mysql/edit?id=${i.id}">$!{i.name}</a></td>
+                <td>${i.env}</td>
+                <td class="tags">${i.tag}</td>
+                <td>主从</td>
+                <td></td>
+                <td>${i.manager}</td>
+                <td>${i.createTime.format("yyyy-MM-dd HH:mm:ss")}</td>
+                <td>
+                    <a href="${CONTEXT_PATH}/mysql/edit?id=${i.id}">编辑</a>
+                    <a href="${CONTEXT_PATH}/mysql/scale?id=${i.id}">扩容</a>
+                    <a href="${CONTEXT_PATH}/mysql/monitor?id=${i.id}">监控</a>
+                </td>
+            </tr>
+            #end
+            </tbody>
+        </table>
+        <!-- 表格结束 -->
+    </div>
+</div>
+#end
+
+
+#tag layout_block("scriptContent")
+<script type="text/javascript">
+    var contextPath = '${CONTEXT_PATH}';
+    $(document).ready(function () {
+//        if (document.body.offsetWidth < 1400) {
+//            $("#content").attr("class", "container-fluid");
+//        }
+        var table = $("#dataTable").DataTable({
+          fixedHeader: true,
+          "processing": true,
+          "order": [[7, 'desc']],
+          "iDisplayLength": 25,
+          "sPaginationType": "full_numbers",
+          "columnDefs": [
+              {"targets": 0, "sortable": false, "searchable": false},
+              {"targets": 8, "sortable": false, "searchable": false}
+          ],
+          "language": {
+              "processing": "加载中...",
+              "lengthMenu": "显示 _MENU_ 项结果",
+              "zeroRecords": "没有匹配结果",
+              "emptyTable": "没有数据",
+              "info": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+              "infoEmpty": "显示第 0 至 0 项结果，共 0 项",
+              "infoFiltered": "(由 _MAX_ 项结果过滤)",
+              "infoPostFix": "",
+              "search": "搜索:",
+              "url": "",
+              "paginate": {
+                  "first": "首页",
+                  "previous": "上页",
+                  "next": "下页",
+                  "last": "末页"
+              }
+          }
+      });
+        table.on('draw', function () {
+            var word = table.search();
+            if (word && word.length > 0) {
+                var body = $(table.table().body());
+                body.removeHighlight();
+                body.highlight(word);
+            }
+        });
+
+        $("#dataTable .tags").each(function(i, n) {
+            var v = $(n).text();
+            if (v) {
+                var _arr = v.split(","), _html = "";
+                if (_arr.length > 0) {
+                    $.each(_arr, function(j, m) {
+                        if (m) {
+                            _html = _html + "<span class=\"label label-primary\">"+m+"</span>&nbsp;"
+                        }
+                    });
+                } else {
+                    _html = _html + "<span class=\"label label-primary\">"+v+"</span>&nbsp;"
+                }
+                $(this).html(_html);
+            }
+        });
+    });
+</script>
+#end
+
+#include("/include/layout2.jetx")

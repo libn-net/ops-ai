@@ -1,0 +1,327 @@
+#set(title="新建Mysql集群")
+#set(navbar="mysql")
+###define(HaproxyGroup config, HaproxyGroup autoConfig)
+#tag layout_block("headContent")
+<link href="//static.foneshare.cn/oss/bootstrap-tokenfield/0.12.0/css/tokenfield-typeahead.min.css" rel="stylesheet">
+<link href="//static.foneshare.cn/oss/bootstrap-tokenfield/0.12.0/css/bootstrap-tokenfield.min.css" rel="stylesheet">
+#end
+#tag layout_block("bodyContent")
+<div class="container-fluid">
+    <ol class="breadcrumb">
+        <li><a href="${CONTEXT_PATH}/"><span class="glyphicon glyphicon-home"></span></a></li>
+        <li><a href="${CONTEXT_PATH}/mysql/list">Mysql集群</a></li>
+        <li class="active">新建Mysql集群</li>
+##        <span class="pull-right">
+##          <a href="${CONTEXT_PATH}/ha/create">新建HA分组</a>
+##        </span>
+    </ol>
+
+    <form id="form" class="form-horizontal" role="form" action="${CONTEXT_PATH}/mysql/save" method="POST">
+##        <input type="hidden" name="id" value="${config.id}"/>
+##        <input type="hidden" name="change" id="change" value="false"/>
+        <div class="form-group has-feedback">
+            <label for="name" class="col-md-2 control-label">集群名称</label>
+            <div class="col-md-3">
+                <input type="text" maxlength="100" class="form-control focused _not_null" name="name" id="name" value="${mc.name}" />
+            </div>
+            <p class="help-block col-md-offset-2">使用英文字符，最长100个字符</p>
+        </div>
+
+        <div class="form-group has-feedback">
+            <label for="env" class="col-md-2 control-label">选择环境</label>
+            <div class="col-md-3">
+                <select class="form-control" id="env" name="env" >
+                    #for(n: envs)
+                    <option value="${n}" #if(mc.env == n) selected="selected" #end >${n}</option>
+                    #end
+                </select>
+            </div>
+        ##            <p class="help-block col-md-offset-2">建议使用英文字符，最长100个字符</p>
+        </div>
+
+        <div class="form-group has-feedback">
+            <label for="manager" class="col-md-2 control-label">负责人</label>
+            <div class="col-md-3">
+                <input type="text" maxlength="100" class="form-control _not_null" name="manager" id="manager" value="${mc.manager}" placeholder="">
+            </div>
+            <p class="help-block col-md-offset-2">多人用逗号分隔</p>
+        </div>
+
+        <div class="form-group has-feedback">
+            <label for="tag" class="col-md-2 control-label">标签</label>
+            <div class="col-md-3">
+                <input type="text" maxlength="100" data-provide="typeahead" class="form-control" name="tag" id="mytag" value="${mc.tag}" placeholder="">
+            </div>
+            <p class="help-block col-md-offset-2">多个标签用逗号分隔</p>
+        </div>
+
+
+        <div class="form-group has-feedback">
+            <label for="env" class="col-md-2 control-label">服务架构</label>
+            <div class="col-md-3">
+                <select class="form-control">
+                    <option value="1">主从架构</option>
+                    <option value="2">读写分离架构</option>
+##                    <option value="3">读写分离架构</option>
+                </select>
+            </div>
+        ##            <p class="help-block col-md-offset-2">建议使用英文字符，最长100个字符</p>
+        </div>
+
+
+        <div class="form-group">
+            <label class="col-md-2 control-label">容器设置</label>
+            <div class="col-md-10 col-lg-10">
+
+                <div class="col-md-6">
+                    <div class="form-group has-feedback">
+                        <label class="col-md-4 control-label">类型</label>
+                        <div class="col-xs-4">Master</div>
+                        <input type="hidden" name="master.type" value="0" />
+                    </div>
+
+                    <div class="form-group has-feedback">
+                        <label class="col-md-4 control-label">实例数</label>
+                        <div class="col-xs-4"><input type="text" name="master.replicas" value="${mc.master.replicas}" class="form-control _not_null" /></div>
+                    </div>
+
+                    <div class="form-group has-feedback">
+                        <label class="col-md-4 control-label">内存请求(MiB)</label>
+                        <div class="col-xs-4"><input type="text" name="master.memory" value="${mc.master.memory}" class="form-control _not_null" /></div>
+                    </div>
+
+                    <div class="form-group has-feedback">
+                        <label class="col-md-4 control-label">CPU请求(Core)</label>
+                        <div class="col-xs-4"><input type="text" name="master.cpu" value="${mc.master.cpu}" class="form-control _not_null" /></div>
+                    </div>
+
+                    <div class="form-group has-feedback">
+                        <label class="col-md-4 control-label">存储请求(GiB)</label>
+                        <div class="col-xs-4"><input type="text" name="master.storage" value="${mc.master.storage}" class="form-control _not_null" /></div>
+                    </div>
+
+                    <div class="form-group has-feedback">
+                        <label class="col-md-4 control-label">开发端口</label>
+                        <div class="col-xs-4"><input type="text" name="master.port" value="${mc.master.port}" class="form-control" placeholder="不填写，自动生成" /></div>
+                    </div>
+
+                    <div class="form-group has-feedback">
+                        <label class="col-md-4 control-label">Root密码</label>
+                        <div class="col-xs-8">
+                            <input type="password" name="master.rootPwd" value="${mc.master.rootPwd}" class="form-control" placeholder="" />
+                        </div>
+                    </div>
+
+                    <div class="form-group _master_up">
+                        <label class="col-md-4 control-label">业务账号</label>
+                        <div class="col-xs-4">
+                            <input type="text" name="master.user" value="${mc.master.user}" class="form-control" placeholder=""/>
+                        </div>
+                        <div class="col-xs-4">
+                            <input type="password" name="master.pwd" value="${mc.master.pwd}" class="form-control" placeholder=""/>
+                        </div>
+##                        <input type="hidden" name="master.userPwd" value="">
+                    </div>
+
+                    <div class="form-group has-feedback">
+                        <label class="col-md-4 control-label">数据库名</label>
+                        <div class="col-xs-8">
+                            <input type="text" name="master.database" value="${mc.master.database}" class="form-control" placeholder="" />
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+                    <div class="form-group has-feedback">
+                        <label class="col-md-4 control-label">类型</label>
+                        <div class="col-xs-4">Slave</div>
+                        <input type="hidden" name="slave.type" value="1" />
+                    </div>
+
+                    <div class="form-group has-feedback">
+                        <label class="col-md-4 control-label">实例数</label>
+                        <div class="col-xs-4"><input type="text" name="slave.replicas" value="${mc.slave.replicas}" class="form-control _not_null" /></div>
+                    </div>
+
+                    <div class="form-group has-feedback">
+                        <label class="col-md-4 control-label">内存请求(MiB)</label>
+                        <div class="col-xs-4"><input type="text" name="slave.memory" value="${mc.slave.memory}" class="form-control _not_null" /></div>
+                    </div>
+
+                    <div class="form-group has-feedback">
+                        <label class="col-md-4 control-label">CPU请求(Core)</label>
+                        <div class="col-xs-4"><input type="text" name="slave.cpu" value="${mc.slave.cpu}" class="form-control _not_null" /></div>
+                    </div>
+
+                    <div class="form-group has-feedback">
+                        <label class="col-md-4 control-label">存储请求(GiB)</label>
+                        <div class="col-xs-4"><input type="text" name="slave.storage" value="${mc.slave.storage}" class="form-control _not_null" /></div>
+                    </div>
+
+                    <div class="form-group has-feedback">
+                        <label class="col-md-4 control-label">开发端口</label>
+                        <div class="col-xs-4"><input type="text" name="slave.port" value="${mc.slave.port}" class="form-control" placeholder="不填写，自动生成" /></div>
+                    </div>
+
+                    <div class="form-group has-feedback">
+                        <label class="col-md-4 control-label">Root密码</label>
+                        <div class="col-xs-8">
+                            <input type="password" name="slave.rootPwd" value="${mc.slave.rootPwd}" class="form-control" placeholder="如不填写，自动生成" />
+                        </div>
+                    </div>
+
+                    <div class="form-group _slave_up">
+                        <label class="col-md-4 control-label">业务账号</label>
+                        <div class="col-xs-4">
+                            <input type="text" name="slave.user" value="${mc.slave.user}" class="form-control" placeholder="账号，可自动生成"/>
+                        </div>
+                        <div class="col-xs-4">
+                            <input type="password" name="slave.pwd" value="${mc.slave.pwd}" class="form-control" placeholder="密码，可自动生成"/>
+                        </div>
+##                        <input type="hidden" name="slave.userPwd" value="">
+                    </div>
+
+                    <div class="form-group has-feedback">
+                        <label class="col-md-4 control-label">数据库名</label>
+                        <div class="col-xs-8">
+                            <input type="text" name="slave.database" value="${mc.slave.database}" class="form-control" placeholder="" />
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="form-group has-feedback">
+            <label for="remark" class="col-md-2 control-label">备注</label>
+            <div class="col-md-7 col-lg-7">
+                <textarea class="form-control" rows="4" name="remark" id="remark" placeholder=""></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-4">
+                <button type="button" class="btn btn-primary" id="openSaveModel">保存</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<div class="modal fade" id="saveModal" tabindex="-1" role="dialog" aria-labelledby="saveModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title text-danger" id="saveModalLabel">危险</h4>
+            </div>
+            <div class="modal-body ">
+                您确定保存吗？
+            </div>
+            <div class="modal-footer">
+                <a type="button" class="btn btn-default" data-dismiss="modal">取消</a>
+                <button type="button" class="btn btn-danger" id="save">确认保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+#end
+
+#tag layout_block("scriptContent")
+<script src="//static.foneshare.cn/oss/formvalidation/js/formValidation.min.js"></script>
+<script src="//static.foneshare.cn/oss/formvalidation/js/framework/bootstrap.min.js"></script>
+<script src="//static.foneshare.cn/oss/jquery/jquery-ui.min.js"></script>
+<script src="//static.foneshare.cn/oss/bootstrap-tokenfield/0.12.0/js/bootstrap-tokenfield.min.js"></script>
+<script src="//static.foneshare.cn/oss/bootstrap-tokenfield/0.11.9/js/typeahead.bundle.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // 焦点在第一个输入框中
+        $("#name").focus();
+
+        // 点击保存按钮
+        $("#openSaveModel").click(function () {
+            if (validate()) {
+                $('#saveModal').modal('show');
+            }
+        });
+
+        // 保存
+        $("#save").click(function () {
+            if (validate()) {
+                $('#form').submit();
+            }
+        });
+
+        // 标签格式化
+        $("#mytag").tokenfield({
+            autocomplete: {
+//                source: [''],
+                delay: 100
+            },
+            showAutocompleteOnFocus: true
+        })
+
+        $('._not_null').change(function (e) {
+            validate();
+        });
+
+        // 验证参数
+        function validate() {
+            var count = 0;
+            $('._not_null').each(function (i, n) {
+                var val = $(n).val();
+                if (val) {
+                    v(n,'ok');
+                } else {
+                    v(n,'err');
+                    count++;
+                }
+            });
+            return count < 1;
+        }
+
+        function v(e, type, msg) {
+
+            var ok = '<span class="glyphicon glyphicon-ok form-control-feedback"></span>',
+                    warn = '<span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>',
+                    err = '<span class="glyphicon glyphicon-remove form-control-feedback"></span>';
+
+            if (!e || !type) {
+                return false;
+            }
+
+            $(e).parent().find('span.glyphicon').remove();
+            $(e).parent().removeClass('has-success has-warning has-error');
+
+            var h = '';
+            var c = '';
+            if (type == 'ok') {
+                h = ok;
+                c = 'has-success';
+            } else if (type == 'warn') {
+                h = warn;
+                c = 'has-warning';
+            } else if (type == 'err') {
+                h = err;
+                c = 'has-error';
+            } else {
+                return false;
+            }
+
+            $(h).insertAfter(e);
+            $(e).parent().addClass(c);
+            $(e).focus();
+            return true;
+        }
+
+    })
+
+</script>
+#end
+
+#include("/include/layout2.jetx")

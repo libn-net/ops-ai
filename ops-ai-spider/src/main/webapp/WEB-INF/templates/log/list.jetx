@@ -1,0 +1,103 @@
+#set(title="审计记录")
+#set(navbar="log")
+#tag layout_block("headContent")
+<style>
+    .dataTable {
+        word-wrap: break-word;
+        word-break: normal;
+        word-break:break-all;
+    }
+    .dataTable td:nth-child(1) {width: 40px;text-align: center;}
+    .dataTable td:nth-child(2) {width: 160px;text-align: center;}
+    .dataTable td:nth-child(3) {width: 80px;text-align: center;}
+    /*.dataTable td:nth-child(4) {overflow:hidden; max-width: 300px; text-overflow: ellipsis}*/
+    .dataTable td:nth-child(5) {width: 150px;text-align: center;}
+    .dataTable td:nth-child(6) {width: 160px;text-align: center;}
+</style>
+#end
+
+#tag layout_block("bodyContent")
+<div class="container-fluid" id="content">
+##    <ol class="breadcrumb">
+##        <li><a href="${CONTEXT_PATH}/"><span class="glyphicon glyphicon-home"></span></a></li>
+##        <li class="active">HA分组列表</li>
+##        <span class="pull-right"><a href="${CONTEXT_PATH}/ha/create" class="btn btn-primary btn-xs">新建HA分组</a></span>
+##    </ol>
+    <div>
+        <!-- 表格开始 -->
+        <table class="table table-bordered" id="dataTable">
+            <thead>
+            <tr>
+                <th>序号</th>
+                <th>类型</th>
+                <th>结果</th>
+                <th>数据</th>
+                <th>操作人</th>
+                <th>操作时间</th>
+            </tr>
+            </thead>
+            <tbody>
+                #for(AppLog i: list)
+            <tr>
+                <td>${for.index}</td>
+                <td>${i.type}</td>
+                <td>${i.result}</td>
+                <td style="text-align: left">${i.data}</td>
+                <td>${i.actor}</td>
+                <td>${i.time.format("yyyy-MM-dd HH:mm:ss")}</td>
+            </tr>
+            #end
+            </tbody>
+        </table>
+        <!-- 表格结束 -->
+    </div>
+</div>
+#end
+
+
+#tag layout_block("scriptContent")
+<script type="text/javascript">
+    $(document).ready(function () {
+        var table = $("#dataTable").DataTable({
+          fixedHeader: true,
+          "processing": true,
+          "order": [[5, 'desc']],
+          "iDisplayLength": 25,
+          "sPaginationType": "full_numbers",
+          "columnDefs": [
+              {"targets": 0, "sortable": false, "searchable": false},
+              {"targets": 3, "sortable": false, "searchable": true}
+          ],
+          "language": {
+              "processing": "加载中...",
+              "lengthMenu": "显示 _MENU_ 项结果",
+              "zeroRecords": "没有匹配结果",
+              "emptyTable": "没有数据",
+              "info": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+              "infoEmpty": "显示第 0 至 0 项结果，共 0 项",
+              "infoFiltered": "(由 _MAX_ 项结果过滤)",
+              "infoPostFix": "",
+              "search": "搜索:",
+              "url": "",
+              "paginate": {
+                  "first": "首页",
+                  "previous": "上页",
+                  "next": "下页",
+                  "last": "末页"
+              }
+          }
+      });
+        table.on('draw', function () {
+            var word = table.search();
+            if (word && word.length > 0) {
+                var body = $(table.table().body());
+                body.removeHighlight();
+                body.highlight(word);
+            }
+        });
+
+    });
+</script>
+#end
+
+#include("/include/layout.jetx")

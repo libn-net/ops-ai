@@ -1,0 +1,290 @@
+#set(title="环境管理")
+#set(navbar="env")
+#tag layout_block("headContent")
+<style>
+    .dataTable td:nth-child(1) {width: 30px;text-align: center;}
+    .dataTable td:nth-child(2) {width: 200px;text-align: left;}
+    .dataTable td:nth-child(3) {width: 200px;text-align: left;}
+</style>
+#end
+
+#tag layout_block("bodyContent")
+<form class="form-horizontal" id="form" role="form" action="${CONTEXT_PATH}/env/copy" method="POST">
+<div class="container-fluid" id="content">
+    <ol class="breadcrumb">
+        <li><a href="${CONTEXT_PATH}/"><span class="glyphicon glyphicon-home"></span></a></li>
+        <li class="active">环境管理</li>
+        <span class="pull-right">
+##            <a href="${CONTEXT_PATH}/mysql/create" class="btn btn-primary btn-xs">新建集群</a>
+        <select  id="namespace">
+            #for(n: ns)
+            <option value="${n.name}" #if(namespace == n.name)selected="selected"#end >${n.name}</option>
+            #end
+        </select>
+        <button type="button" class="btn btn-primary btn-xs" id="showCopyMode">复制服务</button>
+
+        </span>
+    </ol>
+
+    <div class="row">
+        <div class="col-md-4">
+            Deployment
+            <table class="table table-bordered" id="dataTable">
+                <thead>
+                <tr>
+                    <th><input type="checkbox" class="_selectAll" /></th>
+                    <th>Name</th>
+##                    <th>Labels</th>
+                ##                <th>Age</th>
+                    <th>Images</th>
+                </tr>
+                </thead>
+                <tbody>
+                    #for(i: ds)
+                <tr>
+                    <td><input type="checkbox" name="deploymentIds" value="${i.name}" /></td>
+                    <td>$!{i.name}</a></td>
+##                    <td class="tags">${i.labels}</td>
+                ##                <td>${i.age}</td>
+                    <td>${i.images}</td>
+                </tr>
+                #end
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-md-8">
+            Service
+            <table class="table table-bordered" id="dataTable2">
+                <thead>
+                <tr>
+                    <th><input type="checkbox" class="_selectAll" /></th>
+                    <th>Name</th>
+                    <th>Selector</th>
+                    <th>ClusterIP</th>
+                    <th>Ports</th>
+                </tr>
+                </thead>
+                <tbody>
+                    #for(i: ss)
+                <tr>
+                    <td><input type="checkbox" name="serviceIds" value="${i.name}" /></td>
+                    <td>$!{i.name}</a></td>
+                    <td class="tags">${i.selector}</td>
+                    <td>$!{i.clusterIP}</a></td>
+                    <td>${i.ports}</td>
+                </tr>
+                #end
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal" id="envModal" tabindex="-1" role="dialog" aria-labelledby="envModallLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="envModallLabel">复制服务</h4>
+                </div>
+                <div class="modal-body ">
+
+                        <div class="form-group has-feedback">
+                            <label for="name" class="col-md-2 control-label">环境</label>
+    ##                        <div class="col-md-3">
+    ##                            <select class="form-control" name="envSelect">
+    ##                                #for(n: ns)
+    ##                                <option value="${n.name}"  >${n.name}</option>
+    ##                            #end
+    ##                            </select>
+    ##                        </div>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" name="env" />
+                            </div>
+                            <p class="help-block col-md-offset-2">不允许输入已存在的服务</p>
+                        </div>
+
+                        <div class="form-group has-feedback">
+                            <label for="name" class="col-md-2 control-label">NFS-IP</label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" name="mntIp" value="172.31.101.102" />
+                            </div>
+                            <p class="help-block col-md-offset-2">NFS默认使用172.31.101.102</p>
+                        </div>
+
+                        <div class="form-group has-feedback">
+                            <label for="name" class="col-md-2 control-label">挂载目录</label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" name="mntDir" />
+                                <input type="hidden" class="form-control" name="namespace" value="${namespace}"/>
+                            </div>
+                            <p class="help-block col-md-offset-2">输入已配置的挂载目录如：/nsfshare1</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name" class="col-md-2 control-label"></label>
+                            <div class="col-md-10">
+                                <p class="text-danger">请确认输入的存储没有被任何环境使用，否则现有数据会造成脏读</p>
+                                <p class="text-danger">请确认原服务暴露的NodePort端口，会被随机分配到【30000+】</p>
+                            </div>
+                        </div>
+
+                </div>
+                <div class="modal-footer">
+                    <a type="button" class="btn btn-default" data-dismiss="modal">取消</a>
+                    <button type="button" class="btn btn-danger" id="copy">确认</button>
+                </div>
+
+        </div>
+    </div>
+</div>
+</form>
+#end
+
+#tag layout_block("scriptContent")
+<script type="text/javascript">
+    var contextPath = '${CONTEXT_PATH}';
+    $(document).ready(function () {
+//        if (document.body.offsetWidth < 1400) {
+//            $("#content").attr("class", "container-fluid");
+//        }
+        var table = $("#dataTable").DataTable({
+          fixedHeader: true,
+          "processing": true,
+          "order": [],
+          "iDisplayLength": 10,
+          "sPaginationType": "full_numbers",
+          "columnDefs": [
+              {"targets": 0, "sortable": false, "searchable": false}
+          ],
+          "language": {
+              "processing": "加载中...",
+              "lengthMenu": "显示 _MENU_ 项结果",
+              "zeroRecords": "没有匹配结果",
+              "emptyTable": "没有数据",
+              "info": "第 _START_ 至 _END_ 项，共 _TOTAL_ 项",
+              "infoEmpty": "显示第 0 至 0 项结果，共 0 项",
+              "infoFiltered": "(由 _MAX_ 项结果过滤)",
+              "infoPostFix": "",
+              "search": "搜索:",
+              "url": "",
+              "paginate": {
+                  "first": "首",
+                  "previous": "<",
+                  "next": ">",
+                  "last": "末"
+              }
+          }
+      });
+//        table.on('draw', function () {
+//            var word = table.search();
+//            if (word && word.length > 0) {
+//                var body = $(table.table().body());
+//                body.removeHighlight();
+//                body.highlight(word);
+//            }
+//        });
+
+
+        var table2 = $("#dataTable2").DataTable({
+              fixedHeader: true,
+              "processing": true,
+              "order": [],
+              "iDisplayLength": 10,
+              "sPaginationType": "full_numbers",
+              "columnDefs": [
+                  {"targets": 0, "sortable": false, "searchable": false}
+              ],
+              "language": {
+                  "processing": "加载中...",
+                  "lengthMenu": "显示 _MENU_ 项结果",
+                  "zeroRecords": "没有匹配结果",
+                  "emptyTable": "没有数据",
+                  "info": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                  "infoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                  "infoFiltered": "(由 _MAX_ 项结果过滤)",
+                  "infoPostFix": "",
+                  "search": "搜索:",
+                  "url": "",
+                  "paginate": {
+                      "first": "首页",
+                      "previous": "上页",
+                      "next": "下页",
+                      "last": "末页"
+                  }
+              }
+          });
+
+        // 点击打开模态窗口
+        $(document).on("click", "#showCopyMode", function (e) {
+            var deploymentIds = $("input[name=deploymentIds]:checked").size(),
+                    serviceIds = $("input[name=serviceIds]:checked").size();
+            if (deploymentIds == 0 || serviceIds == 0) {
+                alert("请先选择Deployment和Service")
+                return false;
+            }
+
+            $('#envModal').modal('show');
+        });
+
+        // 复制服务
+        $(document).on("click", "#copy", function (e) {
+            var env = $("input[name=env]").val(),
+                    mntDir = $("input[name=mntDir]").val(),
+                    mntIp= $("input[name=mntIp]").val();
+            if (!env) {
+                alert("请填写环境名称");
+                return false;
+            }
+            if (!mntDir) {
+                alert("请填写挂载目录");
+                return false;
+            }
+            if (!mntIp) {
+                alert("请填写NFS IP");
+                return false;
+            }
+            $("#form").submit();
+        });
+
+
+        // 添加选项
+//        $("#dataTable_filter").append($("#templateHtml").html())
+        $(document).on("change", "#namespace", function (e) {
+            window.location.href = "${CONTEXT_PATH}/env/list?namespace="+$(this).val();
+        })
+
+        // 全选
+        $("._selectAll").click(function (e) {
+            $(this).parents("table").find("tbody input[type=checkbox]").each(function () {
+//                $(this).attr("checked", !$(this).attr("checked"));
+                this.checked = !this.checked;
+            })
+        });
+
+        $(".tags").each(function(i, n) {
+            var v = $(n).text();
+            if (v) {
+                var _arr = v.split(","), _html = "";
+                if (_arr.length > 0) {
+                    $.each(_arr, function(j, m) {
+                        if (m) {
+                            _html = _html + "<span class=\"label label-primary\">"+m+"</span>&nbsp;"
+                        }
+                    });
+                } else {
+                    _html = _html + "<span class=\"label label-primary\">"+v+"</span>&nbsp;"
+                }
+                $(this).html(_html);
+            }
+        });
+    });
+</script>
+#end
+
+#include("/include/layout2.jetx")

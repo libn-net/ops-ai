@@ -1,0 +1,7 @@
+#set(title="拒绝访问")
+#tag layout_block("bodyContent")
+<div class="container-fluid">
+  <h1> 抱歉,您访问的页面不存在!</h1>
+</div>
+#end
+#include("/include/layout.jetx")

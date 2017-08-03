@@ -1,0 +1,42 @@
+<nav class="navbar navbar-default container-fluid" role="navigation">
+  <div>
+    <ul class="nav navbar-nav" id="navbar">
+      <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+          <span class="glyphicon glyphicon-th"></span>
+          <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+          <li><a href="/">网址导航</a></li>
+          <li><a href="/publish/">发布系统</a></li>
+          <li><a href="/cms/">配置中心</a></li>
+          <li><a href="/oss/">蜂眼监控</a></li>
+          <li><a href="/pms/">进程管理</a></li>
+          <li><a href="/user/">用户权限</a></li>
+          <li><a href="/buriedtool/">埋点监控</a></li>
+          <li><a href="/gathertool/">数据采集</a></li>
+          <li><a href="/cctrl-center/">云控中心</a></li>
+          <li><a href="/jenkins/">jenkins</a>
+        </ul>
+      </li>
+      <li><a style="padding: 0" href="${CONTEXT_PATH}"><img src="//static.foneshare.cn/oss/images/fxiaoke.logo.png" width="40" height="40" alt="DB云" /></a></li>
+      <li #if(navbar=="env")class="active"#end><a href="${CONTEXT_PATH}/env/list">环境管理</a></li>
+        <li #if(navbar=="mysql")class="active"#end><a href="${CONTEXT_PATH}/mysql/list">Mysql集群</a></li>
+      <li #if(navbar=="mongo")class="active"#end><a href="${CONTEXT_PATH}/mongo/list">Mongo集群</a></li>
+      <li #if(navbar=="ddl")class="active"#end><a href="${CONTEXT_PATH}/ddl">DDL</a></li>
+      <li #if(navbar=="auth")class="active"#end><a href="${CONTEXT_PATH}/auth">授权管理</a></li>
+      <li #if(navbar=="log")class="active"#end><a href="${CONTEXT_PATH}/log">审计记录</a></li>
+      <li #if(navbar=="setting")class="active"#end><a href="${CONTEXT_PATH}/setting">系统设置</a></li>
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+          ${principal()} <b class="caret"></b>
+        </a>
+        <ul class="dropdown-menu">
+          <li><a href="${CONTEXT_PATH}/logout">退出</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</nav>
